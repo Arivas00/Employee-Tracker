@@ -8,14 +8,27 @@ const connection = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PW,
     database: process.env.DB_NAME,
-  });
+});
 
-  
-  connection.connect((err) => {
+
+connection.connect((err) => {
     if (err) throw err;
     start();
-  });
+});
 
-  const start = () => {
-      console.log("Employee Tracker")
-  }
+const start = () => {
+    console.log("******Employee Tracker******")
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                name: "choices",
+                message: "What would you like to do?",
+                choices: [
+                    "View all employees",
+                    "View all employees by department",
+                    "View all employees by manager"
+                ]
+            }
+        ])
+}
