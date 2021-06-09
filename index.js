@@ -75,4 +75,36 @@ function employees() {
 
 function employeesByDepartment() {
 
-}
+};
+
+function employeesByManager() {
+
+};
+
+function addEmployee() {
+
+};
+
+function updateEmployeeRole() {
+
+};
+
+function viewAllRoles() {
+
+};
+
+function addRole() {
+
+};
+
+function viewAllDepartments() {
+
+};
+
+function addDepartment() {
+
+};
+
+function exit() {
+
+};
