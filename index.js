@@ -17,7 +17,10 @@ connection.connect((err) => {
     start();
 });
 
+fixRoleID = getRole();
+
 const start = () => {
+    console.log("\n")
     console.log("********Employee Tracker********")
     inquirer
         .prompt([
@@ -28,11 +31,9 @@ const start = () => {
                 choices: [
                     "View all employees",
                     "View all employees by department",
-                    "View all employees by manager",
                     "Add employee",
                     "Update employee role",
                     "View all roles",
-                    "Add Role",
                     "View all departments",
                     "Add department",
                     "Exit"
@@ -45,22 +46,18 @@ const start = () => {
                     return employees();
                 case "View all employees by department":
                     return employeesByDepartment();
-                case "View all employees by manager":
-                    return employeesByManager();
                 case "Add employee":
                     return addEmployee();
                 case "Update employee role":
                     return updateEmployeeRole();
                 case "View all roles":
                     return viewAllRoles();
-                case "Add role":
-                    return addRole();
                 case "View all departments":
                     return viewAllDepartments();
                 case "Add department":
                     return addDepartment();
                 case "Exit":
-                    return exit();    
+                    return exit();
             }
         })
 }
@@ -74,20 +71,61 @@ function employees() {
 };
 
 function employeesByDepartment() {
-    let 
+    inquirer.prompt([
+        {
+            name: "departments",
+            type: "list",
+            message: "Select a department",
+            choices: getDepartments()
+        }
+    ])
+    
+    
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id = ?"
+    connection.query(query, (err, res) => {
+        console.table(res)
+        start();
+    });
 
 };
 
-function employeesByManager() {
-
-};
+console.log(getDepartments());
 
 function addEmployee() {
-
+    inquirer.prompt([
+        {
+            name: "first_name",
+            type: "input",
+            message: "What is your first name?"
+        },
+        {
+            name: "last_name",
+            type: "input",
+            message: "What is your last name?"
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "Pick a role",
+            choices: getRole()
+        }
+    ])
+        .then((data) => {
+            let roleID = fixRoleID.indexOf(data.role) + 1;
+            let query = "INSERT INTO employee SET ?"
+            connection.query(query, {
+                first_name: data.first_name,
+                last_name: data.last_name,
+                role_id: roleID
+            }, (err, res) => {
+                console.log("Employee added.")
+                start();
+            });
+        })
 };
 
 function updateEmployeeRole() {
-
+    
 };
 
 function viewAllRoles() {
@@ -98,9 +136,6 @@ function viewAllRoles() {
     });
 };
 
-function addRole() {
-
-};
 
 function viewAllDepartments() {
     let query = "SELECT * FROM department ORDER BY id";
@@ -110,6 +145,46 @@ function viewAllDepartments() {
     });
 };
 
+function getDepartments() {
+    let pickDept = [];
+    let query = "SELECT * FROM department";
+    connection.query(query, (err, res) => {
+        for (let i = 0; i < res.length; i++) {
+            pickDept.push(res[i].name);
+        }
+    });
+    return pickDept;
+};
+
+function getRole() {
+    let pickRole = [];
+    let query = "SELECT * FROM role"
+    connection.query(query, (err, res) => {
+        if (err) throw err
+        for (let i = 0; i < res.length; i++) {
+            pickRole.push(res[i].title);
+        }
+
+    })
+    return pickRole;
+};
+
+
+
+function getManager() {
+    let managers = [];
+    let query = "SELECT first_name, last_name FROM employee";
+    connection.query(query, (err, res) => {
+        if (err) throw err
+        for (let i = 0; i < res.length; i++) {
+            managers.push((res[i].first_name) + " " + (res[i].last_name));
+        }
+    })
+    return managers;
+}
+
+
+
 function addDepartment() {
     inquirer.prompt([
         {
@@ -118,15 +193,16 @@ function addDepartment() {
             message: "What is the name of the department?"
         }
     ])
-    .then((data) => {
-        let query = "INSERT INTO department SET ?"
-        connection.query(query, { name: data.department}, (err, res) => {
-            console.log("Department added.")
-            start();
+        .then((data) => {
+            let query = "INSERT INTO department SET ?"
+            connection.query(query, { name: data.department }, (err, res) => {
+                console.log("Department added.")
+                start();
+            })
         })
-    })
 
 };
+
 
 function exit() {
     connection.end();
