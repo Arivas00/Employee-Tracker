@@ -103,7 +103,7 @@ function addRole() {
 };
 
 function viewAllDepartments() {
-    let query = "SELECT * FROM department";
+    let query = "SELECT * FROM department ORDER BY id";
     connection.query(query, (err, res) => {
         console.table(res);
         start();
@@ -111,6 +111,20 @@ function viewAllDepartments() {
 };
 
 function addDepartment() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "department",
+            message: "What is the name of the department?"
+        }
+    ])
+    .then((data) => {
+        let query = "INSERT INTO department SET ?"
+        connection.query(query, { name: data.department}, (err, res) => {
+            console.log("Department added.")
+            start();
+        })
+    })
 
 };
 
