@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 require('dotenv').config();
+require('console.table');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -17,7 +18,7 @@ connection.connect((err) => {
 });
 
 const start = () => {
-    console.log("******Employee Tracker******")
+    console.log("********Employee Tracker********")
     inquirer
         .prompt([
             {
@@ -27,8 +28,51 @@ const start = () => {
                 choices: [
                     "View all employees",
                     "View all employees by department",
-                    "View all employees by manager"
+                    "View all employees by manager",
+                    "Add employee",
+                    "Update employee role",
+                    "View all roles",
+                    "Add Role",
+                    "View all departments",
+                    "Add department",
+                    "Exit"
                 ]
             }
         ])
+        .then((answer) => {
+            switch (answer.choices) {
+                case "View all employees":
+                    return employees();
+                case "View all employees by department":
+                    return employeesByDepartment();
+                case "View all employees by manager":
+                    return employeesByManager();
+                case "Add employee":
+                    return addEmployee();
+                case "Update employee role":
+                    return updateEmployeeRole();
+                case "View all roles":
+                    return viewAllRoles();
+                case "Add role":
+                    return addRole();
+                case "View all departments":
+                    return viewAllDepartments();
+                case "Add department":
+                    return addDepartment();
+                case "Exit":
+                    return exit();    
+            }
+        })
+}
+
+function employees() {
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;"
+    connection.query(query, (err, res) => {
+        console.table(res);
+        start();
+    });
+};
+
+function employeesByDepartment() {
+
 }
