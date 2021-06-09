@@ -74,6 +74,7 @@ function employees() {
 };
 
 function employeesByDepartment() {
+    let 
 
 };
 
@@ -90,7 +91,11 @@ function updateEmployeeRole() {
 };
 
 function viewAllRoles() {
-
+    let query = "SELECT * FROM role";
+    connection.query(query, (err, res) => {
+        console.table(res);
+        start();
+    });
 };
 
 function addRole() {
@@ -98,7 +103,11 @@ function addRole() {
 };
 
 function viewAllDepartments() {
-
+    let query = "SELECT * FROM department";
+    connection.query(query, (err, res) => {
+        console.table(res);
+        start();
+    });
 };
 
 function addDepartment() {
@@ -106,5 +115,5 @@ function addDepartment() {
 };
 
 function exit() {
-
+    connection.end();
 };
